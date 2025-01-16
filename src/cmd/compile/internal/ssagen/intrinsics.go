@@ -1310,6 +1310,16 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return s.newValue2(ssa.OpEq64, types.Types[types.TBOOL], and, one)
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "bitsetLowestSet",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			// TST    $1, args[0]
+			// CSEL   NE, R0
+
+			tst := s.newValue1I(ssa.OpARM64TSTconst, types.TypeFlags, 1, args[0])
+			// FIX: can't make the following use a OpARM64NotEqual...
+			return s.newValue1(ssa.OpARM64Equal, types.Types[types.TBOOL], tst)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "bitsetShiftOutLowest",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {

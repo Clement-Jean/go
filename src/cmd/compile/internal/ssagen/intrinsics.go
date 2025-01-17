@@ -1276,7 +1276,7 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 
 	// With a packed representation we no longer need to shift the result
 	// of TrailingZeros64.
-	alias("internal/runtime/maps", "bitsetFirst", "internal/runtime/sys", "TrailingZeros64", sys.ArchAMD64)
+	alias("internal/runtime/maps", "bitsetFirst", "internal/runtime/sys", "TrailingZeros64", sys.ArchARM64, sys.ArchAMD64)
 
 	addF("internal/runtime/maps", "bitsetRemoveBelow",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
@@ -1296,6 +1296,20 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return s.newValue2(ssa.OpAnd64, types.Types[types.TUINT64], b, mask)
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "bitsetRemoveBelow",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			b := args[0]
+			i := args[1]
+
+			// Clear the lower i bits in b.
+			//
+			// out = b &^ ((1 << i) - 1)
+
+			mask := s.newValue1I(ssa.OpARM64SLLconst, types.Types[types.TUINT64], 1, i)
+			mask = s.newValue1I(ssa.OpARM64SUBconst, types.Types[types.TUINT64], 1, mask)
+			return s.newValue2(ssa.OpARM64BIC, types.Types[types.TUINT64], b, mask)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "bitsetLowestSet",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
@@ -1312,12 +1326,25 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 		sys.AMD64)
 	addF("internal/runtime/maps", "bitsetLowestSet",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			// TODO instead of three instructions we can have only 2:
 			// TST    $1, args[0]
-			// CSEL   NE, R0
+			// CSET   NE, R0
 
-			tst := s.newValue1I(ssa.OpARM64TSTconst, types.TypeFlags, 1, args[0])
-			// FIX: can't make the following use a OpARM64NotEqual...
-			return s.newValue1(ssa.OpARM64Equal, types.Types[types.TBOOL], tst)
+			b := args[0]
+
+			// Test the lowest bit in b.
+			//
+			// out = (b & 1) != 0
+
+			//and := s.newValue1I(ssa.OpARM64ANDconst, types.Types[types.TUINT64], 1, b)
+			// can't use 0 for newValue1I as AuxInt for OpARM64CMPconst (for NotEqual)...
+			//cmp := s.newValue1I(ssa.OpARM64CMPconst, types.TypeFlags, 1, and)
+			tst := s.newValue1I(ssa.OpARM64TSTconst, types.TypeFlags, 1, b)
+
+			// FIX: can't make the following use a OpARM64NotEqual for TSTconst...
+			// FIX: can't make the following use a OpARM64Equal for CMPconst...
+			return s.newValue1(ssa.OpARM64NotEqual, types.Types[types.TBOOL], tst)
+			//return s.newValue1(ssa.OpARM64Equal, types.Types[types.TBOOL], cmp)
 		},
 		sys.ARM64)
 
@@ -1333,6 +1360,18 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return s.newValue2(ssa.OpRsh64Ux64, types.Types[types.TUINT64], b, one)
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "bitsetShiftOutLowest",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			b := args[0]
+
+			// Right shift out the lowest bit in b.
+			//
+			// out = b >> 1
+
+			// FIX: I can only generate LSR $8, R0 and not LSR $1, R0...
+			return s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 1, b)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "ctrlGroupMatchH2",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {

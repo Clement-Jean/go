@@ -1305,8 +1305,11 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			//
 			// out = b &^ ((1 << i) - 1)
 
-			mask := s.newValue1I(ssa.OpARM64SLLconst, types.Types[types.TUINT64], 1, i)
+			one := s.constInt64(types.Types[types.TUINT64], 1)
+
+			mask := s.newValue2(ssa.OpARM64SLL, types.Types[types.TUINT64], one, i)
 			mask = s.newValue1I(ssa.OpARM64SUBconst, types.Types[types.TUINT64], 1, mask)
+
 			return s.newValue2(ssa.OpARM64BIC, types.Types[types.TUINT64], b, mask)
 		},
 		sys.ARM64)
@@ -1326,25 +1329,14 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 		sys.AMD64)
 	addF("internal/runtime/maps", "bitsetLowestSet",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
-			// TODO instead of three instructions we can have only 2:
-			// TST    $1, args[0]
-			// CSET   NE, R0
-
 			b := args[0]
 
 			// Test the lowest bit in b.
 			//
 			// out = (b & 1) != 0
 
-			//and := s.newValue1I(ssa.OpARM64ANDconst, types.Types[types.TUINT64], 1, b)
-			// can't use 0 for newValue1I as AuxInt for OpARM64CMPconst (for NotEqual)...
-			//cmp := s.newValue1I(ssa.OpARM64CMPconst, types.TypeFlags, 1, and)
 			tst := s.newValue1I(ssa.OpARM64TSTconst, types.TypeFlags, 1, b)
-
-			// FIX: can't make the following use a OpARM64NotEqual for TSTconst...
-			// FIX: can't make the following use a OpARM64Equal for CMPconst...
 			return s.newValue1(ssa.OpARM64NotEqual, types.Types[types.TBOOL], tst)
-			//return s.newValue1(ssa.OpARM64Equal, types.Types[types.TBOOL], cmp)
 		},
 		sys.ARM64)
 
@@ -1368,7 +1360,6 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			//
 			// out = b >> 1
 
-			// FIX: I can only generate LSR $8, R0 and not LSR $1, R0...
 			return s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 1, b)
 		},
 		sys.ARM64)

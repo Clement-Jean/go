@@ -475,6 +475,8 @@ var Anames = []string{
 	"VBIT",
 	"VBSL",
 	"VCMEQ",
+	"VCMGE",
+	"VCMGT",
 	"VCMTST",
 	"VCNT",
 	"VDUP",

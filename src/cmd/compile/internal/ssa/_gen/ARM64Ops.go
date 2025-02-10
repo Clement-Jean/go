@@ -247,8 +247,16 @@ func init() {
 		{name: "RBITW", argLength: 1, reg: gp11, asm: "RBITW"},                                // bit reverse, 32-bit
 		{name: "CLZ", argLength: 1, reg: gp11, asm: "CLZ"},                                    // count leading zero, 64-bit
 		{name: "CLZW", argLength: 1, reg: gp11, asm: "CLZW"},                                  // count leading zero, 32-bit
-		{name: "VCNT", argLength: 1, reg: fp11, asm: "VCNT"},                                  // count set bits for each 8-bit unit and store the result in each 8-bit unit
-		{name: "VUADDLV", argLength: 1, reg: fp11, asm: "VUADDLV"},                            // unsigned sum of eight bytes in a 64-bit value, zero extended to 64-bit.
+		{name: "VANDB8", argLength: 2, reg: fp21, asm: "VAND"},
+		{name: "VCMEQB8", argLength: 2, reg: fp21, asm: "VCMEQ"},
+		{name: "VCMGEB8", argLength: 2, reg: fp21, asm: "VCMGE"},
+		{name: "VCMGTB8", argLength: 2, reg: fp21, asm: "VCMGT"},
+		{name: "VCNT", argLength: 1, reg: fp11, asm: "VCNT"}, // count set bits for each 8-bit unit and store the result in each 8-bit unit
+		{name: "VDUPB8", argLength: 1, reg: gpfp, asm: "VDUP"},
+		{name: "VDUPB16", argLength: 1, reg: gpfp, asm: "VDUP"},
+		{name: "VMOVDlane", argLength: 1, reg: fpgp, asm: "VMOV", aux: "Int64"},
+		{name: "VUSHRH4const", argLength: 1, reg: fp11, asm: "VUSHR", aux: "Int64"},
+		{name: "VUADDLV", argLength: 1, reg: fp11, asm: "VUADDLV"}, // unsigned sum of eight bytes in a 64-bit value, zero extended to 64-bit.
 		{name: "LoweredRound32F", argLength: 1, reg: fp11, resultInArg0: true, zeroWidth: true},
 		{name: "LoweredRound64F", argLength: 1, reg: fp11, resultInArg0: true, zeroWidth: true},
 

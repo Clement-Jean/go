@@ -1435,6 +1435,35 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return ret
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "ctrlGroupMatchH2",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			g := args[0]
+			h := args[1]
+
+			// Explicit copies to fp registers. See
+			// https://go.dev/issue/70451.
+			gfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, g)
+
+			broadcast := s.newValue1(ssa.OpARM64VDUPB8, types.TypeInt128, h)
+			eq := s.newValue2(ssa.OpARM64VCMEQB8, types.TypeInt128, gfp, broadcast)
+
+			// PACKED REPRESENTATION
+			var m uint64 = 0x000103070F1F3F80
+			mc := s.constInt64(types.Types[types.TUINT64], int64(m))
+
+			out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], eq)
+			out = s.newValue2(ssa.OpARM64MUL, types.Types[types.TUINT64], mc, out)
+			out = s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 56, out)
+			ret := s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
+			return ret
+
+			// OTHER REPRESENTATION
+			// out := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, eq)
+			// var o uint64 = 0x8080808080808080
+			// oc := s.constInt64(types.Types[types.TUINT64], int64(o))
+			// return s.newValue2(ssa.OpARM64AND, types.Types[types.TUINT64], oc, out)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "ctrlGroupMatchEmpty",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
@@ -1524,6 +1553,34 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "ctrlGroupMatchEmpty",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			g := args[0]
+
+			// Explicit copies to fp registers. See
+			// https://go.dev/issue/70451.
+			gfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, g)
+
+			var e uint64 = 0x8080808080808080
+			ec := s.constInt64(types.Types[types.TUINT64], int64(e))
+			efp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, ec)
+
+			eq := s.newValue2(ssa.OpARM64VCMEQB8, types.TypeInt128, efp, gfp)
+
+			// PACKED REPRESENTATION
+			var m uint64 = 0x000103070F1F3F80
+			mc := s.constInt64(types.Types[types.TUINT64], int64(m))
+
+			out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], eq)
+			out = s.newValue2(ssa.OpARM64MUL, types.Types[types.TUINT64], mc, out)
+			out = s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 56, out)
+			ret := s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
+			return ret
+
+			// OTHER REPRESENTATION
+			// return s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], eq)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "ctrlGroupMatchEmptyOrDeleted",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
@@ -1557,6 +1614,34 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return ret
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "ctrlGroupMatchEmptyOrDeleted",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			g := args[0]
+
+			// Explicit copies to fp registers. See
+			// https://go.dev/issue/70451.
+			gfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, g)
+
+			var m uint64 = 0xFFFFFFFFFFFFFFFF
+			sentinel := s.constInt64(types.Types[types.TUINT64], int64(m))
+			sfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, sentinel)
+
+			gt := s.newValue2(ssa.OpARM64VCMGTB8, types.TypeInt128, gfp, sfp)
+
+			// PACKED REPRESENTATION
+			m = 0x000103070F1F3F80
+			mc := s.constInt64(types.Types[types.TUINT64], int64(m))
+
+			out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], gt)
+			out = s.newValue2(ssa.OpARM64MUL, types.Types[types.TUINT64], mc, out)
+			out = s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 56, out)
+			ret := s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
+			return ret
+
+			// OTHER REPRESENTATION
+			// out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], gt)
+		},
+		sys.ARM64)
 
 	addF("internal/runtime/maps", "ctrlGroupMatchFull",
 		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
@@ -1591,6 +1676,34 @@ func initIntrinsics(cfg *intrinsicBuildConfig) {
 			return s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
 		},
 		sys.AMD64)
+	addF("internal/runtime/maps", "ctrlGroupMatchFull",
+		func(s *state, n *ir.CallExpr, args []*ssa.Value) *ssa.Value {
+			g := args[0]
+
+			// Explicit copies to fp registers. See
+			// https://go.dev/issue/70451.
+			gfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, g)
+
+			var m uint64 = 0xFFFFFFFFFFFFFFFF
+			sentinel := s.constInt64(types.Types[types.TUINT64], int64(m))
+			sfp := s.newValue1(ssa.OpARM64FMOVDgpfp, types.TypeInt128, sentinel)
+
+			ge := s.newValue2(ssa.OpARM64VCMGTB8, types.TypeInt128, sfp, gfp)
+
+			// PACKED REPRESENTATION
+			m = 0x000103070F1F3F80
+			mc := s.constInt64(types.Types[types.TUINT64], int64(m))
+
+			out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], ge)
+			out = s.newValue2(ssa.OpARM64MUL, types.Types[types.TUINT64], mc, out)
+			out = s.newValue1I(ssa.OpARM64SRLconst, types.Types[types.TUINT64], 56, out)
+			ret := s.newValue1(ssa.OpZeroExt8to64, types.Types[types.TUINT64], out)
+			return ret
+
+			// OTHER REPRESENTATION
+			// out := s.newValue1(ssa.OpARM64FMOVDfpgp, types.Types[types.TUINT64], ge)
+		},
+		sys.ARM64)
 }
 
 // findIntrinsic returns a function which builds the SSA equivalent of the

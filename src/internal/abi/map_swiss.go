@@ -26,7 +26,8 @@ const (
 	bitsetLSB = 0x0101010101010101
 
 	// Value of control word with all empty slots.
-	SwissMapCtrlEmpty = bitsetLSB * uint64(ctrlEmpty)
+	SwissMapCtrlEmpty    = bitsetLSB * uint64(ctrlEmpty)
+	SwissMapCtrlSentinel = 0xFFFFFFFFFFFFFFFF
 )
 
 type SwissMapType struct {

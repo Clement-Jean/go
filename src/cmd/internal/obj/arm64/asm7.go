@@ -3240,6 +3240,8 @@ func buildop(ctxt *obj.Link) {
 		case AVADDP:
 			oprangeset(AVAND, t)
 			oprangeset(AVCMEQ, t)
+			oprangeset(AVCMGE, t)
+			oprangeset(AVCMGT, t)
 			oprangeset(AVORR, t)
 			oprangeset(AVEOR, t)
 			oprangeset(AVBSL, t)
@@ -6547,6 +6549,12 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As) uint32 {
 
 	case AVCMEQ:
 		return 1<<29 | 0x71<<21 | 0x23<<10
+
+	case AVCMGE:
+		return 0x71<<21 | 0xF<<10
+
+	case AVCMGT:
+		return 0x71<<21 | 0xD<<10
 
 	case AVCNT:
 		return 0xE<<24 | 0x10<<17 | 5<<12 | 2<<10

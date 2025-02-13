@@ -596,7 +596,7 @@ TEXT asmtest(SB),DUPOK|NOSPLIT,$-8
 	FMSUBD F11, F7, F15, F31                   // ff9d4b1f
 	//TODO VFMUL V9.S[2], F21, F19             // b39a895f
 	//TODO VFMUL V26.S[2], V26.S2, V2.S2       // 429b9a0f
-	//TODO VFMUL V21.D2, V17.D2, V25.D2        // 39de756e
+	VFMUL V21.D2, V17.D2, V25.D2               // 39de756e
 	FMULS F0, F6, F24                          // d808201e
 	FMULD F5, F29, F9                          // a90b651e
 	//TODO VFMULX V26.S[2], F20, F8            // 889a9a7f

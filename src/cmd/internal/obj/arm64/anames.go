@@ -484,6 +484,7 @@ var Anames = []string{
 	"VFADD",
 	"VFMLA",
 	"VFMLS",
+	"VFMUL",
 	"VFSUB",
 	"VLD1",
 	"VLD1R",

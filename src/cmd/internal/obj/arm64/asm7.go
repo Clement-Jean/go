@@ -3280,7 +3280,9 @@ func buildop(ctxt *obj.Link) {
 			oprangeset(AVUADDLV, t)
 
 		case AVFMLA:
+			oprangeset(AVFADD, t)
 			oprangeset(AVFMLS, t)
+			oprangeset(AVFSUB, t)
 
 		case AVPMULL:
 			oprangeset(AVPMULL2, t)
@@ -4807,7 +4809,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			Sym:  p.From.Sym,
 		})
 
-	case 72: /* vaddp/vand/vcmeq/vorr/vadd/veor/vfmla/vfmls/vbit/vbsl/vcmtst/vsub/vbif/vuzip1/vuzip2/vrax1 Vm.<T>, Vn.<T>, Vd.<T> */
+	case 72: /* vaddp/vand/vcmeq/vorr/vadd/veor/vfadd/vfmla/vfmls/vfsub/vbit/vbsl/vcmtst/vsub/vbif/vuzip1/vuzip2/vrax1 Vm.<T>, Vn.<T>, Vd.<T> */
 		af := int((p.From.Reg >> 5) & 15)
 		af3 := int((p.Reg >> 5) & 15)
 		at := int((p.To.Reg >> 5) & 15)
@@ -4853,7 +4855,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			if af != ARNG_16B && af != ARNG_8B {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
-		case AVFMLA, AVFMLS:
+		case AVFADD, AVFMLA, AVFMLS, AVFSUB:
 			if af != ARNG_2D && af != ARNG_2S && af != ARNG_4S {
 				c.ctxt.Diag("invalid arrangement: %v", p)
 			}
@@ -4869,7 +4871,7 @@ func (c *ctxt7) asmout(p *obj.Prog, out []uint32) (count int) {
 			size = 1
 		case AVORR, AVBIT, AVBIF:
 			size = 2
-		case AVFMLA, AVFMLS:
+		case AVFADD, AVFMLA, AVFMLS, AVFSUB:
 			if af == ARNG_2D {
 				size = 1
 			} else {
@@ -6587,11 +6589,17 @@ func (c *ctxt7) oprrr(p *obj.Prog, a obj.As) uint32 {
 	case AVUADDLV:
 		return 1<<29 | 7<<25 | 3<<20 | 7<<11
 
+	case AVFADD:
+		return 7<<25 | 1<<21 | 53<<10
+
 	case AVFMLA:
 		return 7<<25 | 0<<23 | 1<<21 | 3<<14 | 3<<10
 
 	case AVFMLS:
 		return 7<<25 | 1<<23 | 1<<21 | 3<<14 | 3<<10
+
+	case AVFSUB:
+		return 7<<25 | 10<<20 | 53<<10
 
 	case AVPMULL, AVPMULL2:
 		return 0xE<<24 | 1<<21 | 0x38<<10

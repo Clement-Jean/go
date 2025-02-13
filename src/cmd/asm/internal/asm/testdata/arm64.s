@@ -120,12 +120,18 @@ TEXT	foo(SB), DUPOK|NOSPLIT, $-8
 	VADD	V1, V3, V3                      // 6384e15e
 	VSUB	V12, V30, V30                   // de87ec7e
 	VSUB	V12, V20, V30                   // 9e86ec7e
+	VFADD	V1.D2, V12.D2, V1.D2		// 81d5614e
+	VFADD	V1.S2, V12.S2, V1.S2		// 81d5210e
+	VFADD	V1.S4, V12.S4, V1.S4		// 81d5214e
 	VFMLA	V1.D2, V12.D2, V1.D2            // 81cd614e
 	VFMLA	V1.S2, V12.S2, V1.S2            // 81cd210e
 	VFMLA	V1.S4, V12.S4, V1.S4            // 81cd214e
 	VFMLS	V1.D2, V12.D2, V1.D2            // 81cde14e
 	VFMLS	V1.S2, V12.S2, V1.S2            // 81cda10e
 	VFMLS	V1.S4, V12.S4, V1.S4            // 81cda14e
+	VFSUB	V1.D2, V12.D2, V1.D2		// 81d5e14e
+	VFSUB	V1.S2, V12.S2, V1.S2		// 81d5a10e
+	VFSUB	V1.S4, V12.S4, V1.S4		// 81d5a14e
 	VEXT	$4, V2.B8, V1.B8, V3.B8         // 2320022e
 	VEXT	$8, V2.B16, V1.B16, V3.B16      // 2340026e
 	VRBIT	V24.B16, V24.B16                // 185b606e

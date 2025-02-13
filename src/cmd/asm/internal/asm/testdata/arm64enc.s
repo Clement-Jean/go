@@ -433,7 +433,7 @@ TEXT asmtest(SB),DUPOK|NOSPLIT,$-8
 	//TODO VFACGE V11.S2, V15.S2, V9.S2        // e9ed2b2e
 	//TODO FACGT F20, F16, F27                 // 1beef47e
 	//TODO VFACGT V15.S4, V25.S4, V22.S4       // 36efaf6e
-	//TODO VFADD V21.D2, V10.D2, V21.D2        // 55d5754e
+	VFADD V21.D2, V10.D2, V21.D2               // 55d5754e
 	FADDS F12, F2, F10                         // 4a282c1e
 	FADDD F24, F14, F12                        // cc29781e
 	//TODO VFADDP V4.D2, F13                   // 8dd8707e
@@ -612,6 +612,7 @@ TEXT asmtest(SB),DUPOK|NOSPLIT,$-8
 	FNMSUBD F29, F25, F8, F10                  // 0ae57d1f
 	FNMULS F24, F22, F18                       // d28a381e
 	FNMULD F14, F30, F7                        // c78b6e1e
+	VFSUB V21.D2, V10.D2, V21.D2               // 55d5f54e
 	//TODO FRECPE F9, F2                       // 22d9e15e
 	//TODO VFRECPE V0.S2, V28.S2               // 1cd8a10e
 	//TODO FRECPS F28, F10, F9                 // 49fd3c5e
